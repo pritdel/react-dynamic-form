@@ -1,0 +1,19 @@
+{
+    "english": "Inglesa",
+    "spanish": "Española",
+    "Welcome to Dynamic Form": "Formulario dinámico con traducción",
+    "dynamicFormTranslation": "Traducción de forma dinámica",
+    "sectionOne": "Sección 1",
+    "sectionTwo": "Sección 2",
+    "sectionThree": "Sección 3",
+    "name": "Nombre",
+    "country": "Elige país",
+    "terms": "Términos y Condiciones",
+    "occupation": "Ocupación",
+    "gender": "Género",
+    "pregnant": "Estás embarazada",
+    "dateFormat": "Formato de fecha",
+    "dob": "Fecha de nacimiento",
+    "help": "Por favor proporcione su ayuda",
+    "document": "Cargue su documento"
+}

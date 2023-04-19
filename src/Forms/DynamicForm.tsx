@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import Container from '@mui/material/Container';
 import TextField from '@mui/material/TextField';
 import { makeStyles } from '@mui/styles';
 import Button from '@mui/material/Button';
@@ -14,6 +13,8 @@ import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import FileUpload from "react-mui-fileuploader";
+import './DynamicForm.css'
+import { useTranslation } from "react-i18next";
 
 const useStyles = makeStyles((theme: any) => ({
   root: {
@@ -44,7 +45,7 @@ const useStyles = makeStyles((theme: any) => ({
 
 const DynamicForm = () => {
   const classes = useStyles();
-
+  const { t, i18n } = useTranslation();
   const [inputFields, setInputFields] = useState([
     { name: "", country: "", termsCondition: false, occupation: "", gender: "", pregnant: "", dateFormat: "", dob: "", help: "", file: "" }
   ]);
@@ -62,7 +63,13 @@ const DynamicForm = () => {
         if (Array.isArray(event) && event.length) {
           values[index]['file'] = event;
         } else if (event.$d) {
-          values[index]['dob'] = event.$d;
+          if (values[index]['dateFormat'] === 'YYYY') {
+            values[index]['dob'] = `${new Date(event.$d).getFullYear()}`;
+          } else if (values[index]['dateFormat'] === 'MM/YYYY') {
+            values[index]['dob'] = `${new Date(event.$d).getMonth()}/${new Date(event.$d).getFullYear()}`;
+          } else if (values[index]['dateFormat'] === 'MM/DD/YYYY'){
+            values[index]['dob'] = `${new Date(event.$d).getDate()}/${new Date(event.$d).getMonth()}/${new Date(event.$d).getFullYear()}`;
+          }
         }
         else {
           values[index][(event.target as HTMLInputElement)?.name] = (event.target as HTMLInputElement)?.value;
@@ -93,21 +100,19 @@ const DynamicForm = () => {
   }));
 
   return (
-    <div className="App">
-      <h1 className="main-heading">Dynamic Form In React</h1>
+    <div className="Dyanmic-Form">
       <Box sx={{ flexGrow: 1 }}>
       <form onSubmit={handleSubmit} className={classes.root}>
         <Grid container spacing={{ xs: 2, md: 3 }} columns={{ xs: 4, sm: 8, md: 12 }}>
           {inputFields.map((inputField, index) => (
             <>
             <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
-              <Divider />
-              <h2> Section 1</h2>
+              <h2> {t('sectionOne')} </h2>
             </Grid>
             <Grid xs={6} sm={6} md={5} lg={5} xl={5}>
                 <TextField
                 name="name"
-                label="Name"
+                label={t('name')}
                 variant="standard"
                 value={inputField.name}
                 onChange={(event) => handleChangeInput(index, event)}
@@ -115,38 +120,38 @@ const DynamicForm = () => {
               
             </Grid>
             <Grid xs={6} sm={6} md={4} lg={4} xl={4}>
-            <Autocomplete
-              id="country-select"
-              sx={{ width: 300 }}
-              options={countries}
-              autoHighlight
-              getOptionLabel={(option) => option.label}
-              onChange={(event, value) => handleChangeInput(index, event, value)}
-              renderOption={(props, option) => (
-                <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
-                  <img
-                    loading="lazy"
-                    width="20"
-                    src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
-                    srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
-                    alt=""
+              <Autocomplete
+                id="country-select"
+                sx={{ width: 300 }}
+                options={countries}
+                autoHighlight
+                getOptionLabel={(option) => option.label}
+                onChange={(event, value) => handleChangeInput(index, event, value)}
+                renderOption={(props, option) => (
+                  <Box component="li" sx={{ '& > img': { mr: 2, flexShrink: 0 } }} {...props}>
+                    <img
+                      loading="lazy"
+                      width="20"
+                      src={`https://flagcdn.com/w20/${option.code.toLowerCase()}.png`}
+                      srcSet={`https://flagcdn.com/w40/${option.code.toLowerCase()}.png 2x`}
+                      alt=""
+                    />
+                    {option.label} ({option.code})
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    variant="standard"
+                    label={t('country')}
+                    name="country"
+                    inputProps={{
+                      ...params.inputProps,
+                      autoComplete: 'new-password', // disable autocomplete and autofill
+                    }}
                   />
-                  {option.label} ({option.code})
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  variant="standard"
-                  label="Choose a country"
-                  name="country"
-                  inputProps={{
-                    ...params.inputProps,
-                    autoComplete: 'new-password', // disable autocomplete and autofill
-                  }}
-                />
-              )}
-    />
+                )}
+            />
             </Grid>
             <Grid xs={6} sm={6} md={3} lg={3} xl={3}>
             <FormControlLabel
@@ -156,16 +161,16 @@ const DynamicForm = () => {
                 checked={inputField.termsCondition} 
                 onChange={(event) => handleChangeInput(index, event)}  />
               }
-              label="Terms & Condition"
+              label={t('terms')}
             />
             </Grid>
             <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
-              <h2> Section 2</h2>
+              <h2> {t('sectionTwo')} </h2>
             </Grid>
             <Grid xs={12} sm={6} md={2} lg={2} xl={2}>
               <TextField
                   name="occupation"
-                  label="Occupation"
+                  label={t('occupation')}
                   variant="standard"
                   value={inputField.occupation}
                   onChange={(event) => handleChangeInput(index, event)}
@@ -174,7 +179,7 @@ const DynamicForm = () => {
 
             <Grid xs={12} sm={6} md={3} lg={3} xl={3}>
                 <FormControl>
-                <FormLabel className="radio-label">Gender</FormLabel>
+                <FormLabel className="radio-label">{t('gender')}</FormLabel>
                 <RadioGroup
                   row
                   aria-labelledby="demo-row-radio-buttons-group-label"
@@ -189,7 +194,7 @@ const DynamicForm = () => {
 
             {inputField.gender === 'female' && <Grid xs={12} sm={6} md={2} lg={2} xl={2}>
                 <FormControl>
-                <FormLabel className="radio-label">Are You Pregnant</FormLabel>
+                <FormLabel className="radio-label">{t('pregnant')}</FormLabel>
                 <RadioGroup
                   row
                   aria-labelledby="demo-row-radio-buttons-group-label"
@@ -204,7 +209,7 @@ const DynamicForm = () => {
 
             <Grid xs={12} sm={6} md={2} lg={2} xl={2}>
               <FormControl fullWidth>
-                <InputLabel id="demo-simple-select-label">Date Format</InputLabel>
+                <InputLabel id="demo-simple-select-label">{t('dateFormat')}</InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
@@ -224,7 +229,7 @@ const DynamicForm = () => {
             {inputField.dateFormat && <Grid xs={12} sm={6} md={3} lg={3} xl={3}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DemoContainer components={['DatePicker']}>
-                <DatePicker label="Date of Birth"
+                <DatePicker label={t('dob')}
                  onChange={(event) => handleChangeInput(index, event)}
                  views={inputField.dateFormat === 'YYYY' ? ["year"]: inputField.dateFormat === 'MM/YYYY' ? ['month', 'year'] : ['year', 'month', 'day']}
                  slotProps={{
@@ -241,14 +246,14 @@ const DynamicForm = () => {
             </Grid> }
           
             <Grid xs={12} sm={12} md={12} lg={12} xl={12}>
-              <h2> Section 3 </h2>
+              <h2> {t('sectionThree')} </h2>
             </Grid>
             <Grid xs={12} sm={6} md={6} lg={6} xl={6}>
               <TextField
                   multiline
                   rows={2}
                   name="help"
-                  label="Please Provide Your Help"
+                  label={t('help')}
                   variant="standard"
                   value={inputField.help}
                   onChange={(event) => handleChangeInput(index, event)}
@@ -259,12 +264,11 @@ const DynamicForm = () => {
             <>
             <FileUpload
               multiFile={true}
-              title="Please upload your document"
+              title={t('document')}
               imageSrc=""
               onFilesChange={(event) => handleChangeInput(index, event)}
               onContextReady={(context) => {}}
             />
-            {/* <button onClick={uploadFiles}>Upload</button> */}
           </>
             </Grid>
 
@@ -275,6 +279,7 @@ const DynamicForm = () => {
                 <IconButton onClick={() => handleAddFields()}>
                   <AddIcon />
                 </IconButton>
+                <Divider />
             </Grid>
            
             </>
